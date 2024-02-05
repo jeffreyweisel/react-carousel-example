@@ -1,0 +1,74 @@
+// not currently using but created for potentional use later
+import React, { useEffect, useState } from 'react';
+import { Carousel, CarouselItem, CarouselControl, CarouselIndicators, CarouselCaption } from 'reactstrap';
+import { getItems } from '../../DataManagers/itemManager';
+
+
+
+export default function HomeImageCarousel() {
+    const [items, setItems] = useState([]);
+    const [activeIndex, setActiveIndex] = useState(0);
+    const [animating, setAnimating] = useState(false);
+  
+    useEffect(() => {
+      getItems().then(setItems);
+      console.log(items);
+    }, []);
+  
+    const next = () => {
+      if (animating) return;
+      const nextIndex = activeIndex === items.length - 1 ? 0 : activeIndex + 1;
+      setActiveIndex(nextIndex);
+    };
+  
+    const previous = () => {
+      if (animating) return;
+      const nextIndex = activeIndex === 0 ? items.length - 1 : activeIndex - 1;
+      setActiveIndex(nextIndex);
+    };
+  
+    const goToIndex = (newIndex) => {
+      if (animating) return;
+      setActiveIndex(newIndex);
+    };
+  
+    return (
+      <Carousel
+        activeIndex={activeIndex}
+        next={next}
+        previous={previous}
+      >
+        {items.length > 0 && (
+          <CarouselIndicators
+            items={items.map((home) => ({ src: home.homeImage }))}
+            activeIndex={activeIndex}
+            onClickHandler={goToIndex}
+          />
+        )}
+        {items.map((home) => (
+          <CarouselItem
+            key={item.id}
+            onExiting={() => setAnimating(true)}
+            onExited={() => setAnimating(false)}
+          >
+            <img src={item.img} alt="supposedtobeimage" 
+             style={{ width: '700px', height: '500px', objectFit: 'cover' }}/>
+            <CarouselCaption
+              captionText={home.price.toLocaleString('en-US')}
+              captionHeader={home.streetAddress}
+            />
+          </CarouselItem>
+        ))}
+        <CarouselControl
+          direction="prev"
+          directionText="Previous"
+          onClickHandler={previous}
+        />
+        <CarouselControl
+          direction="next"
+          directionText="Next"
+          onClickHandler={next}
+        />
+      </Carousel>
+    );
+  }
